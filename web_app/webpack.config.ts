@@ -1,6 +1,8 @@
 import path from 'path'
 import webpack from "webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+
 import type {Configuration as DevServerConfiguration} from "webpack-dev-server";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import Dotenv  from "dotenv-webpack";
@@ -36,6 +38,9 @@ export default (env: EnvVariables) => {
         plugins: [
             // указываем на основе какого шаблона будет создаваться html-файл, в который будут подключаться скрипты
             new HtmlWebpackPlugin({template: path.resolve(__dirname, 'public', 'index.html')}),
+            new CopyWebpackPlugin({'patterns': [
+                    { from: './src/assets', to: 'images' }
+                ]}),
             // показывает процент выполнения сборки
             isDev && new webpack.ProgressPlugin(),
             // позволяет использовать сss-loader, который минимизирует css в отдельные файлы
@@ -47,6 +52,14 @@ export default (env: EnvVariables) => {
         ].filter(Boolean),
         module: {
             rules: [
+                {
+                    test: /\.(png|jpe?g|gif)$/i,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                        },
+                    ],
+                },
                 {
                     test: /\.css$/i,
                     // порядок следования лоудеров имеет значение

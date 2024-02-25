@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,6 +9,8 @@ import (
 	"github.com/rs/cors"
 	"github.com/spruceid/siwe-go"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 type signInParams struct {
@@ -17,6 +20,8 @@ type signInParams struct {
 
 var store = sessions.NewCookieStore([]byte("SESSION_KEY"))
 
+const fileName = "wallets.txt"
+
 func main() {
 	mux := http.NewServeMux()
 
@@ -24,7 +29,8 @@ func main() {
 
 	mux.HandleFunc("GET /api/nonce", makeHTTPHandleFunc(getNonce))
 	mux.HandleFunc("POST /api/signin", makeHTTPHandleFunc(signin))
-	mux.HandleFunc("GET /api/participate", withAuth(makeHTTPHandleFunc(participate)))
+	mux.HandleFunc("GET /api/participate", withAuth(makeHTTPHandleFunc(isParticipate)))
+	mux.HandleFunc("POST /api/participate", withAuth(makeHTTPHandleFunc(setParticipate)))
 	mux.HandleFunc("GET /api/signout", withAuth(makeHTTPHandleFunc(signout)))
 
 	//handler := cors.Default().Handler(mux)
@@ -41,11 +47,35 @@ func main() {
 	http.ListenAndServe(":8085", handler)
 }
 
-func participate(w http.ResponseWriter, r *http.Request) error {
+func setParticipate(w http.ResponseWriter, r *http.Request) error {
+	session, _ := store.Get(r, "sessionId")
+	address := session.Values["address"].(string)
 
-	// todo: get data from store
+	isAddress, err := contain(address)
+	if err != nil {
+		return err
+	}
 
-	return WriteText(w, http.StatusOK, "participate")
+	if !isAddress {
+		err := save(address)
+		if err != nil {
+			return err
+		}
+	}
+
+	return WriteText(w, http.StatusOK, "")
+}
+
+func isParticipate(w http.ResponseWriter, r *http.Request) error {
+	session, _ := store.Get(r, "sessionId")
+	address := session.Values["address"].(string)
+
+	isAddress, err := contain(address)
+	if err != nil {
+		return err
+	}
+
+	return WriteText(w, http.StatusOK, strconv.FormatBool(isAddress))
 }
 
 func getNonce(w http.ResponseWriter, r *http.Request) error {
@@ -91,7 +121,6 @@ func signin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return WriteJSON(w, http.StatusOK, nil)
-
 }
 
 func signout(w http.ResponseWriter, r *http.Request) error {
@@ -138,6 +167,44 @@ func WriteText(w http.ResponseWriter, status int, v string) error {
 	w.WriteHeader(status)
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(v))
+
+	return nil
+}
+
+func contain(address string) (bool, error) {
+	f, err := os.Open(fileName)
+
+	if err != nil {
+		return false, err
+	}
+
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if address == scanner.Text() {
+			return true, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+
+	return false, nil
+}
+
+func save(address string) error {
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if _, err := f.WriteString(fmt.Sprintf("%s\n", address)); err != nil {
+		return err
+	}
 
 	return nil
 }
