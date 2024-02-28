@@ -1,7 +1,7 @@
 // @ts-ignore
 import logo from '../assets/logo.png';
 // @ts-ignore
-import banner from '../assets/wallet.png';
+import banner from '../assets/banner.png';
 import ConnectButton from "../component/ConnectButton";
 
 
@@ -61,15 +61,16 @@ export function WelcomePage() {
                         {/*</div>*/}
 
                         {/*<div className="max-w-475">*/}
-                        <div style={{display: "flex", justifyContent: "space-between", marginTop: "50px"}}>
-                            <div className="max-w-475">
+                        <div style={{display: "flex", justifyContent: "space-between", marginTop: "50px", flexWrap: "wrap"}}>
+                            <div className="max-w-475" style={{marginBottom: "20px"}}>
                                 <p style={{color: "white"}} className="p-18">Our team specializes in promoting
                                     the BRC-20 network, developing a
                                     fully autonomous crypto wallet and exchange.</p>
                             </div>
 
                             <div className="max-w-475">
-                                <p style={{color: "orange"}} className="p-18">We aim to make cryptocurrencies
+                            {/*<div style={{width: "calc(100% / 2)"}}>*/}
+                            <p style={{color: "orange"}} className="p-18">We aim to make cryptocurrencies
                                     accessible and convenient for all users by offering innovative solutions and secure
                                     technologies</p>
                             </div>
@@ -79,7 +80,7 @@ export function WelcomePage() {
                 </section>
 
                 <section className="sec-bridging">
-                    <div className="cont-1260 horiz">
+                    <div className="cont-1260 horiz" style={{marginTop: "20px"}}>
                         <div className="max-w-535" style={{marginTop: "40px"}}>
                             <h2 className="h2-91">Associated projects on the BRC-20 network</h2>
                             <div className="box-img show-mob" style={{padding: '0'}}>
@@ -149,9 +150,9 @@ export function WelcomePage() {
                             <div className="footer-menu-col">
                                 <div className="text-16px footer-title">Socials</div>
                                 <div className="footer-links">
-                                    <a href="https://twitter.com/BRC20com" target="_blank"
+                                    <a href="https://twitter.com/adaptivebrc20" target="_blank"
                                        className="text-14px footer-link">Twitter</a>
-                                    <a href="https://t.me/brc_20_com" target="_blank"
+                                    <a href="https://t.me/adaptivebrc20" target="_blank"
                                        className="text-14px footer-link">Telegram</a>
                                 </div>
                             </div>
