@@ -11,4 +11,3 @@ func TestContainAddress(t *testing.T) {
 	b, _ := contain("bbb")
 	println(b)
 }
-wealcom

@@ -27,7 +27,7 @@ function ConnectButton() {
                         data-w-id="fe515213-ada7-58ca-3984-dc6eeb4ce466"
                         className="button w-button"
                 >
-                    Войти и принять участие
+                    Participate
                 </button>
             }
             {
