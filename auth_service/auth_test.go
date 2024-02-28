@@ -3,11 +3,21 @@ package main
 import "testing"
 
 func TestSaveAddress(t *testing.T) {
-	save("aaa")
-	save("welcome")
+	saveWallet("aaa1")
+	saveWallet("welcome2")
 }
 
 func TestContainAddress(t *testing.T) {
-	b, _ := contain("bbb")
-	println(b)
+	address, isPaid, _ := getWallet("aaa1")
+	if address == "" {
+		panic("error")
+	}
+	println(isPaid)
+}
+
+func TestUpdatePaid(t *testing.T) {
+	err := updateWallet("aaa1", true)
+	if err != nil {
+		panic("error")
+	}
 }
