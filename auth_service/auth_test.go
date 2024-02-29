@@ -2,21 +2,24 @@ package main
 
 import "testing"
 
+var testStore = Store{}
+
 func TestSaveAddress(t *testing.T) {
-	saveWallet("aaa1")
-	saveWallet("welcome2")
+	testStore.saveWallet("aaa")
+	testStore.saveWallet("ccc")
+	testStore.saveWallet("ddd")
 }
 
 func TestContainAddress(t *testing.T) {
-	address, isPaid, _ := getWallet("aaa1")
-	if address == "" {
+	walletInfo, err := testStore.getWallet("aaa")
+	if err != nil {
 		panic("error")
 	}
-	println(isPaid)
+	println(walletInfo)
 }
 
 func TestUpdatePaid(t *testing.T) {
-	err := updateWallet("aaa1", true)
+	err := testStore.updateWallet("ccc", true)
 	if err != nil {
 		panic("error")
 	}

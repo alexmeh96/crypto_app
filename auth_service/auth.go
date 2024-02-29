@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/spruceid/siwe-go"
 	"net/http"
-	"strconv"
+	"sync"
 )
 
 type signInParams struct {
@@ -13,7 +13,16 @@ type signInParams struct {
 	Signature string `json:"signature"`
 }
 
-func signIn(w http.ResponseWriter, r *http.Request) error {
+type Wallet struct {
+	Address string `json:"address"`
+	Paid    bool   `json:"paid"`
+}
+
+type Auth struct {
+	mu sync.RWMutex
+}
+
+func (a *Auth) signIn(w http.ResponseWriter, r *http.Request) error {
 	var data signInParams
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		return err
@@ -24,7 +33,7 @@ func signIn(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	session, _ := store.Get(r, "sessionId")
+	session, _ := sessionStore.Get(r, "sessionId")
 	nonce := session.Values["nonce"]
 
 	if siweMessage.GetNonce() != nonce {
@@ -35,10 +44,24 @@ func signIn(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	err = saveWallet(siweMessage.GetAddress().String())
+	a.mu.Lock()
+	walletInfo, err := store.getWallet(siweMessage.GetAddress().String())
 	if err != nil {
+		a.mu.Unlock()
 		return err
 	}
+	if walletInfo == nil {
+		if err = store.saveWallet(siweMessage.GetAddress().String()); err != nil {
+			a.mu.Unlock()
+			return err
+		}
+
+		walletInfo = &Wallet{
+			Address: siweMessage.GetAddress().String(),
+			Paid:    false,
+		}
+	}
+	a.mu.Unlock()
 
 	session.Values["address"] = siweMessage.GetAddress().String()
 	session.Values["authenticated"] = true
@@ -47,11 +70,11 @@ func signIn(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	return WriteJSON(w, http.StatusOK, nil)
+	return WriteJSON(w, http.StatusOK, walletInfo)
 }
 
-func signOut(w http.ResponseWriter, r *http.Request) error {
-	session, _ := store.Get(r, "sessionId")
+func (a *Auth) signOut(w http.ResponseWriter, r *http.Request) error {
+	session, _ := sessionStore.Get(r, "sessionId")
 	session.Values["authenticated"] = false
 	delete(session.Values, "address")
 
@@ -61,41 +84,38 @@ func signOut(w http.ResponseWriter, r *http.Request) error {
 	return WriteJSON(w, http.StatusOK, nil)
 }
 
-func updatePaid(w http.ResponseWriter, r *http.Request) error {
-	session, _ := store.Get(r, "sessionId")
+func (a *Auth) updatePaid(w http.ResponseWriter, r *http.Request) error {
+	session, _ := sessionStore.Get(r, "sessionId")
 	address := session.Values["address"].(string)
 
-	addr, _, err := getWallet(address)
-	if err != nil {
+	a.mu.Lock()
+	if err := store.updateWallet(address, true); err != nil {
+		a.mu.Unlock()
 		return err
 	}
-
-	if addr != "" {
-		err := updateWallet(address, true)
-		if err != nil {
-			return err
-		}
-	}
+	a.mu.Unlock()
 
 	return WriteText(w, http.StatusOK, "")
 }
 
-func getInfo(w http.ResponseWriter, r *http.Request) error {
-	session, _ := store.Get(r, "sessionId")
+func (a *Auth) getInfo(w http.ResponseWriter, r *http.Request) error {
+	session, _ := sessionStore.Get(r, "sessionId")
 	address := session.Values["address"].(string)
 
-	_, isPaid, err := getWallet(address)
+	a.mu.RLock()
+	walletInfo, err := store.getWallet(address)
+	a.mu.Unlock()
 	if err != nil {
 		return err
 	}
 
-	return WriteText(w, http.StatusOK, strconv.FormatBool(isPaid))
+	return WriteJSON(w, http.StatusOK, walletInfo)
 }
 
-func getNonce(w http.ResponseWriter, r *http.Request) error {
+func (a *Auth) getNonce(w http.ResponseWriter, r *http.Request) error {
 	nonce := siwe.GenerateNonce()
 
-	session, _ := store.Get(r, "sessionId")
+	session, _ := sessionStore.Get(r, "sessionId")
 	session.Values["nonce"] = nonce
 
 	if err := session.Save(r, w); err != nil {

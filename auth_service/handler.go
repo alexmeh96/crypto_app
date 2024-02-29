@@ -7,7 +7,7 @@ import (
 
 func withAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		session, _ := store.Get(r, "sessionId")
+		session, _ := sessionStore.Get(r, "sessionId")
 
 		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 			WriteJSON(w, http.StatusUnauthorized, "Unauthorized")

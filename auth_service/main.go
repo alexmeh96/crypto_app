@@ -7,20 +7,21 @@ import (
 	"net/http"
 )
 
-var store = sessions.NewCookieStore([]byte("SESSION_KEY"))
-
-const fileName = "wallets.txt"
+var sessionStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
+var store = Store{}
+var auth = Auth{}
 
 func main() {
 	mux := http.NewServeMux()
 
-	store.Options.HttpOnly = true
+	sessionStore.Options.HttpOnly = true
 
-	mux.HandleFunc("GET /api/nonce", makeHTTPHandleFunc(getNonce))
-	mux.HandleFunc("POST /api/signin", makeHTTPHandleFunc(signIn))
-	mux.HandleFunc("GET /api/info", withAuth(makeHTTPHandleFunc(getInfo)))
-	mux.HandleFunc("POST /api/paid", withAuth(makeHTTPHandleFunc(updatePaid)))
-	mux.HandleFunc("GET /api/signout", withAuth(makeHTTPHandleFunc(signOut)))
+	mux.HandleFunc("GET /api/nonce", makeHTTPHandleFunc(auth.getNonce))
+	mux.HandleFunc("POST /api/signin", makeHTTPHandleFunc(auth.signIn))
+	mux.HandleFunc("GET /api/signout", withAuth(makeHTTPHandleFunc(auth.signOut)))
+
+	mux.HandleFunc("GET /api/info", withAuth(makeHTTPHandleFunc(auth.getInfo)))
+	mux.HandleFunc("POST /api/paid", withAuth(makeHTTPHandleFunc(auth.updatePaid)))
 
 	//handler := cors.Default().Handler(mux)
 

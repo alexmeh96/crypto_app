@@ -4,18 +4,23 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
-func getWallets() (string, error) {
+const fileName = "wallets.txt"
+
+type Store struct{}
+
+func (s *Store) getWallets() (string, error) {
 
 	return "", nil
 }
 
-func getWallet(address string) (string, bool, error) {
+func (s *Store) getWallet(address string) (*Wallet, error) {
 	f, err := os.Open(fileName)
 
 	if err != nil {
-		return "", false, err
+		return nil, err
 	}
 
 	defer f.Close()
@@ -24,53 +29,71 @@ func getWallet(address string) (string, bool, error) {
 	paidAcc := fmt.Sprintf("%s true", address)
 
 	scanner := bufio.NewScanner(f)
+
 	for scanner.Scan() {
 		if scanner.Text() == acc {
-			return address, false, nil
+			return &Wallet{address, false}, nil
 		} else if scanner.Text() == paidAcc {
-			return address, true, nil
+			return &Wallet{address, true}, nil
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return "", false, err
+		return nil, err
 	}
 
-	return "", false, nil
+	return nil, nil
 }
 
-// todo: предоьвратить имеющую запись
-func saveWallet(address string) error {
-	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func (s *Store) saveWallet(address string) error {
+	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 
-	defer f.Close()
+	defer file.Close()
 
-	if _, err := f.WriteString(fmt.Sprintf("%s %t\n", address, false)); err != nil {
+	if _, err := file.WriteString(fmt.Sprintf("%s %t\n", address, false)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func updateWallet(address string, isPaid bool) error {
-	//file, err := os.OpenFile(fileName, os.O_RDWR, 0644)
-	//if err != nil {
-	//	return err
-	//}
-	//defer file.Close()
-	//
-	//scanner := bufio.NewScanner(file)
-	//for scanner.Scan() {
-	//	line := scanner.Text()
-	//
-	//	if strings.Contains(line, address) {
-	//		line = fmt.Sprintf("%s %t\n", address, isPaid)
-	//		return nil
-	//	}
-	//}
-	//
-	return fmt.Errorf("wallet %s not found", address)
+func (s *Store) updateWallet(address string, isPaid bool) error {
+	file, err := os.OpenFile(fileName, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	var lines []string
+	var found bool
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, address) {
+			found = true
+			line = fmt.Sprintf("%s %t", address, isPaid) // Update the line content
+		}
+
+		lines = append(lines, line)
+	}
+
+	if !found {
+		return fmt.Errorf("wallet %s not found", address)
+	}
+
+	// Truncate the file and write the updated content
+	file.Truncate(0)
+	file.Seek(0, 0)
+	writer := bufio.NewWriter(file)
+	for _, line := range lines {
+		fmt.Fprintln(writer, line)
+	}
+	writer.Flush()
+
+	return nil
 }
