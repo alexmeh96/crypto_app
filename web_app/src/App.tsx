@@ -6,8 +6,12 @@ import {queryClient} from "./index";
 import {WelcomePage} from "./pages/WelcomPage";
 
 
-export const App = () => {
+export interface WalletInfo {
+    address: string;
+    paid: boolean;
+}
 
+export const App = () => {
     return (
         <div>
             <WagmiProvider config={config}>

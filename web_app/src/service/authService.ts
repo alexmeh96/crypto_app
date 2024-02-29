@@ -1,5 +1,6 @@
-import {config} from "./config";
+import {config} from "../config";
 import {getAccount} from '@wagmi/core'
+import {WalletInfo} from "../App";
 
 
 export async function getNonce() {
@@ -10,7 +11,7 @@ export async function getNonce() {
     return await res.text()
 }
 
-export async function validateMessage({message, signature}: any) {
+export async function validateMessage({message, signature}: any): Promise<WalletInfo> {
     const res = await fetch('http://localhost:8085/api/signin', {
         method: "POST",
         headers: {
@@ -20,7 +21,7 @@ export async function validateMessage({message, signature}: any) {
         credentials: 'include',
     })
 
-    return true
+    return await res.json();
 }
 
 export async function getSession() {
@@ -29,28 +30,35 @@ export async function getSession() {
     return {address, chainId}
 }
 
-export async function valid() {
+export async function getInfo(): Promise<WalletInfo> {
     try {
-        const res = await fetch('http://localhost:8085/api/participate', {
+        const res = await fetch('http://localhost:8085/api/info', {
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
         })
+        console.log(res)
 
-        console.log(await res.text())
+        if (res.ok) {
+            return await res.json();
+        }
+
+        throw await res.json()
     } catch (err) {
-
         console.log(err)
+        throw err
     }
 }
 
 export async function signOut() {
     try {
-        const res = await fetch('http://localhost:8085/api/signout', {
+        await fetch('http://localhost:8085/api/signout', {
             credentials: 'include',
         })
 
-        console.log(await res.text())
     } catch (err) {
-
         console.log(err)
+        throw err
     }
 }

@@ -2,15 +2,75 @@
 import logo from '../assets/logo.png';
 // @ts-ignore
 import banner from '../assets/banner.png';
-import ConnectButton from "../component/ConnectButton";
+import ConnectComponent from "../component/ConnectComponent";
+import {useStore} from "../store/store";
+import {useEffect, useState} from "react";
+import {getInfo, signOut} from "../service/authService";
+import {useAccount, useDisconnect} from "wagmi";
+import PayComponent from "../component/PayComponent";
 
+
+export interface WalletInfo {
+    address: string;
+    paid: boolean;
+}
 
 export function WelcomePage() {
+
+    const {walletInfo, setWalletInfo} = useStore()
+
+    const [load, setLoad] = useState(true)
+    const {address, isConnected} = useAccount()
+    const { disconnect } = useDisconnect()
+
+    async function handleStart() {
+        if (isConnected && address) {
+            try {
+                const data = await getInfo()
+                setWalletInfo(data)
+            } catch (e) {
+
+            } finally {
+                setLoad(false)
+            }
+        } else {
+            setLoad(false)
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await signOut()
+            disconnect()
+            setWalletInfo(null)
+        } catch (e) {
+
+        }
+    }
+
+    useEffect(() => {
+        handleStart()
+    }, []);
+
     return (
         <div>
             <div className="box-banner w-inline-block">
                 <img src={logo} loading="lazy" alt="" className="image-5"/>
                 <div className="t-20">First round $10% of the total number of participants $</div>
+
+                {
+                    walletInfo && !load &&
+                    <div style={{justifyContent: 'right'}}>
+                        <button onClick={handleLogout}
+                                data-w-id="fe515213-ada7-58ca-3984-dc6eeb4ce466"
+                                className="button w-button"
+                                style={{width: "unset", paddingLeft: "30px", paddingRight: "30px"}}
+                        >
+                            logout
+                        </button>
+                    </div>
+                }
+
             </div>
 
             <div className="wrp-line">
@@ -27,9 +87,21 @@ export function WelcomePage() {
                             </h1>
                         </div>
                     </div>
-                    <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
-                        <ConnectButton/>
-                    </div>
+                    {/*{*/}
+                    {/*    load && <div>load...</div>*/}
+                    {/*}*/}
+                    {
+                        !walletInfo && !load &&
+                        <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
+                            <ConnectComponent/>
+                        </div>
+                    }
+                    {
+                        walletInfo && !load &&
+                        <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
+                            <PayComponent/>
+                        </div>
+                    }
                 </section>
                 <section className="sec-solution">
                     <div className="cont-1260">
@@ -37,31 +109,12 @@ export function WelcomePage() {
                             Adaptive <span className="color-orange">BRC-20</span> solution
                             solution
                         </h2>
-                        {/*<div className="wrp-text-solution">*/}
-                        {/*    <div className="max-w-475">*/}
-                        {/*        <p className="p-18">Our team specializes in promoting the BRC-20 network, developing a*/}
-                        {/*            fully autonomous crypto wallet and exchange.</p>*/}
-                        {/*        <p className="p-18">We aim to make cryptocurrencies*/}
-                        {/*            accessible and convenient for all users by offering innovative solutions and secure*/}
-                        {/*            technologies</p>*/}
-                        {/*    </div>*/}
-                        {/*    <img src={logo} loading="lazy" alt="" className="img-mockup hide-mob"/>*/}
-                        {/*    /!*<img src={banner} loading="lazy" alt="" className="img-mockup show-mob"/>*!/*/}
-
-                        {/*    /!*<img*!/*/}
-                        {/*    /!*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201.webp"*!/*/}
-                        {/*    /!*    alt="" sizes="(max-width: 479px) 100vw, (max-width: 1439px) 55vw, 792px"*!/*/}
-                        {/*    /!*    srcSet="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-500.webp 500w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-800.webp 800w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-1080.webp 1080w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201.webp 1584w"*!/*/}
-                        {/*    /!*    className="img-mockup hide-mob"/>*!/*/}
-                        {/*    /!*<img*!/*/}
-                        {/*    /!*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201.webp"*!/*/}
-                        {/*    /!*    alt="" sizes="100vw"*!/*/}
-                        {/*    /!*    srcSet="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-500.webp 500w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-800.webp 800w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201-p-1080.webp 1080w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655e54283d81f1438834a59e_%D0%B0%D0%BF%201.webp 1584w"*!/*/}
-                        {/*    /!*    className="img-mockup show-mob"/>*!/*/}
-                        {/*</div>*/}
-
-                        {/*<div className="max-w-475">*/}
-                        <div style={{display: "flex", justifyContent: "space-between", marginTop: "50px", flexWrap: "wrap"}}>
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginTop: "50px",
+                            flexWrap: "wrap"
+                        }}>
                             <div className="max-w-475" style={{marginBottom: "20px"}}>
                                 <p style={{color: "white"}} className="p-18">Our team specializes in promoting
                                     the BRC-20 network, developing a
@@ -69,8 +122,7 @@ export function WelcomePage() {
                             </div>
 
                             <div className="max-w-475">
-                            {/*<div style={{width: "calc(100% / 2)"}}>*/}
-                            <p style={{color: "orange"}} className="p-18">We aim to make cryptocurrencies
+                                <p style={{color: "orange"}} className="p-18">We aim to make cryptocurrencies
                                     accessible and convenient for all users by offering innovative solutions and secure
                                     technologies</p>
                             </div>
@@ -86,48 +138,16 @@ export function WelcomePage() {
                             <div className="box-img show-mob" style={{padding: '0'}}>
                                 <img src={banner} loading="lazy" alt="" className="image-4" sizes="100vw"
                                      style={{minHeight: "unset"}}/>
-
-                                {/*<img src={logo} loading="lazy" alt="" className="image-4" sizes="100vw"*/}
-                                {/*     style={{minHeight: "unset"}}/>*/}
-
-                                {/*<img*/}
-                                {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035.webp"*/}
-                                {/*    loading="lazy" sizes="100vw"*/}
-                                {/*    srcSet="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035-p-500.webp 500w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035-p-800.webp 800w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035.webp 958w"*/}
-                                {/*    alt="" className="image-4"/>*/}
-                                {/*<img*/}
-                                {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8fd94aec99d99cfba79_6.svg"*/}
-                                {/*    loading="lazy" alt="" className="img-corner-bringing"/>*/}
-                                {/*<img*/}
-                                {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8fd94aec99d99cfba79_6.svg"*/}
-                                {/*    loading="lazy" alt="" className="img-corner-bringing _2"/>*/}
                             </div>
                             <div className="max-w-480">
                                 <p className="p-18">Token holders of DAPT will have a unique opportunity to participate
                                     in private rounds and airdrops of other projects.</p>
-                                {/*<p className="p-18">Stake to participate in new Adapt launches and receive fees from*/}
-                                {/*    across the Adapt.com product suite</p>*/}
                             </div>
                         </div>
                         <div className="box-img hide-mob"
                              style={{marginRight: '-50px', marginTop: '20px', padding: 0, maxWidth: "unset"}}>
                             <img src={banner} loading="lazy" alt="" className="image-4"
                                  sizes="(max-width: 479px) 100vw, (max-width: 1439px) 33vw, 479px"/>
-
-                            {/*<img src={logo} loading="lazy" alt="" className="image-4"*/}
-                            {/*     sizes="(max-width: 479px) 100vw, (max-width: 1439px) 33vw, 479px"/>*/}
-
-                            {/*<img*/}
-                            {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035.webp"*/}
-                            {/*    alt="" sizes="(max-width: 479px) 100vw, (max-width: 1439px) 33vw, 479px"*/}
-                            {/*    srcSet="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035-p-500.webp 500w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035-p-800.webp 800w, https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8c5649d2df1c692800c_Rectangle%202035.webp 958w"*/}
-                            {/*    className="image-4"/>*/}
-                            {/*<img*/}
-                            {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8fd94aec99d99cfba79_6.svg"*/}
-                            {/*    loading="lazy" alt="" className="img-corner-bringing"/>*/}
-                            {/*<img*/}
-                            {/*    src="https://assets-global.website-files.com/655764008e28e2e8d3dd2945/655df8fd94aec99d99cfba79_6.svg"*/}
-                            {/*    loading="lazy" alt="" className="img-corner-bringing _2"/>*/}
                         </div>
                     </div>
                 </section>

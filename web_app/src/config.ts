@@ -3,8 +3,9 @@ import {createWeb3Modal} from "@web3modal/wagmi/react";
 import {SiweMessage} from 'siwe'
 import {createSIWEConfig} from '@web3modal/siwe'
 import type {SIWECreateMessageArgs, SIWEVerifyMessageArgs} from '@web3modal/core'
-import {getNonce, getSession, signOut, validateMessage} from "./authService";
+import {getNonce, getSession, signOut, validateMessage} from "./service/authService";
 import {defaultWagmiConfig} from "@web3modal/wagmi";
+import {useStore} from "./store/store";
 
 const projectId = process.env.PROJECT_ID || 'd74e4c0a6c8b102c3f63ef7066b52612'
 
@@ -51,9 +52,8 @@ export const config = defaultWagmiConfig({
     enableInjected: false
 })
 
-console.log("!!!")
-
 const siweConfig = createSIWEConfig({
+    // enabled: false,
     createMessage: ({ nonce, address, chainId }: SIWECreateMessageArgs) =>
         new SiweMessage({
             version: '1',
@@ -97,9 +97,10 @@ const siweConfig = createSIWEConfig({
 
             // Use your SIWE server to verify if the message and the signature are valid
             // Your back-end will tipically rely on SiweMessage(message).validate(signature)
-            const isValid = await validateMessage({ message, signature })
+            const walletInfo = await validateMessage({ message, signature })
+            useStore.setState({walletInfo})
 
-            return isValid
+            return true
         } catch (error) {
             return false
         }

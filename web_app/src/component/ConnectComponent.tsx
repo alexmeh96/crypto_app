@@ -1,19 +1,20 @@
 import {useAccount, useDisconnect} from "wagmi";
 import {useWeb3Modal} from '@web3modal/wagmi/react'
+import {useEffect} from "react";
 
-function ConnectButton() {
+function ConnectComponent() {
 
-    const {isConnected, isDisconnected} = useAccount()
-    const {disconnect} = useDisconnect()
+    const {isConnected} = useAccount()
+    const { disconnect } = useDisconnect()
 
     const {open} = useWeb3Modal()
 
-    // {
-    //     isDisconnected && <button onClick={() => open()}></button>
-    // }
-    // {
-    //     isConnected && <button onClick={() => disconnect()}></button>
-    // }
+    // useEffect(() => {
+    //     if (isConnected) {
+    //         console.log("WWW")
+    //         disconnect()
+    //     }
+    // }, []);
 
     function handleConnect() {
         open({view: "Networks"})
@@ -22,7 +23,6 @@ function ConnectButton() {
     return (
         <div>
             {
-                isDisconnected &&
                 <button onClick={handleConnect}
                         data-w-id="fe515213-ada7-58ca-3984-dc6eeb4ce466"
                         className="button w-button"
@@ -31,12 +31,8 @@ function ConnectButton() {
                     Participate
                 </button>
             }
-            {
-                isConnected && <div>Вы подали заявку на участие</div>
-            }
-            {/*<w3m-network-button/>*/}
         </div>
     );
 }
 
-export default ConnectButton;
+export default ConnectComponent;

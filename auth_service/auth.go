@@ -104,7 +104,7 @@ func (a *Auth) getInfo(w http.ResponseWriter, r *http.Request) error {
 
 	a.mu.RLock()
 	walletInfo, err := store.getWallet(address)
-	a.mu.Unlock()
+	a.mu.RUnlock()
 	if err != nil {
 		return err
 	}
