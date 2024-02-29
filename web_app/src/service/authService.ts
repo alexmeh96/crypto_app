@@ -51,6 +51,27 @@ export async function getInfo(): Promise<WalletInfo> {
     }
 }
 
+export async function pay() {
+    try {
+        const res = await fetch('http://localhost:8085/api/paid', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+
+        if (res.ok) {
+            return
+        }
+
+        throw await res.json()
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
+
 export async function signOut() {
     try {
         await fetch('http://localhost:8085/api/signout', {

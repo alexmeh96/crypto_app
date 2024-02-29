@@ -21,7 +21,7 @@ export function WelcomePage() {
 
     const [load, setLoad] = useState(true)
     const {address, isConnected} = useAccount()
-    const { disconnect } = useDisconnect()
+    const {disconnect} = useDisconnect()
 
     async function handleStart() {
         if (isConnected && address) {
@@ -99,7 +99,12 @@ export function WelcomePage() {
                     {
                         walletInfo && !load &&
                         <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
-                            <PayComponent/>
+                            {
+                                !walletInfo.paid && <PayComponent/>
+                            }
+                            {
+                                walletInfo.paid && <div>Paid</div>
+                            }
                         </div>
                     }
                 </section>

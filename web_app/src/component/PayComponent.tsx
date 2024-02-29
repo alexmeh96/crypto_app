@@ -1,8 +1,18 @@
+import {pay} from "../service/authService";
+import {useStore} from "../store/store";
+
 function PayComponent() {
 
+    const {walletInfo, setWalletInfo} = useStore()
 
-    function handlePay() {
 
+    async function handlePay() {
+        try {
+            await pay()
+            setWalletInfo({address: walletInfo.address, paid: true})
+        } catch (e) {
+
+        }
     }
 
     return (
