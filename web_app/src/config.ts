@@ -1,15 +1,25 @@
-import {createConfig, http} from "wagmi";
-import {arbitrum, base, mainnet, optimism} from "wagmi/chains";
-import {walletConnect} from 'wagmi/connectors'
+import {arbitrum, avalanche, base, bsc, fantom, gnosis, mainnet, optimism, polygon, sepolia} from "wagmi/chains";
 import {createWeb3Modal} from "@web3modal/wagmi/react";
 import {SiweMessage} from 'siwe'
 import {createSIWEConfig} from '@web3modal/siwe'
 import type {SIWECreateMessageArgs, SIWEVerifyMessageArgs} from '@web3modal/core'
 import {getNonce, getSession, signOut, validateMessage} from "./authService";
+import {defaultWagmiConfig} from "@web3modal/wagmi";
 
 const projectId = process.env.PROJECT_ID || 'd74e4c0a6c8b102c3f63ef7066b52612'
 
-const chains = [mainnet, optimism, arbitrum, base] as const
+const chains = [
+    sepolia,
+    mainnet,
+    polygon,
+    avalanche,
+    arbitrum,
+    bsc,
+    optimism,
+    gnosis,
+    fantom,
+    base
+] as const
 
 const metadata = {
     name: 'Web3Modal',
@@ -18,20 +28,27 @@ const metadata = {
     icons: ['https://avatars.githubusercontent.com/u/37784886'],
 }
 
-export const config = createConfig({
+// export const config = createConfig({
+//     chains,
+//     connectors: [
+//         // injected(),
+//         walletConnect({ projectId, metadata, showQrModal: false }),
+//         // metaMask(),
+//         // safe(),
+//     ],
+//     transports: {
+//         [sepolia.id]: http(),
+//         [mainnet.id]: http(),
+//         [optimism.id]: http(),
+//         [arbitrum.id]: http(),
+//         [base.id]: http(),
+//     },
+// })
+export const config = defaultWagmiConfig({
     chains,
-    connectors: [
-        // injected(),
-        walletConnect({ projectId, metadata, showQrModal: false }),
-        // metaMask(),
-        // safe(),
-    ],
-    transports: {
-        [mainnet.id]: http(),
-        [optimism.id]: http(),
-        [arbitrum.id]: http(),
-        [base.id]: http(),
-    },
+    projectId,
+    metadata,
+    enableInjected: false
 })
 
 console.log("!!!")

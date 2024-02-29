@@ -16,7 +16,7 @@ function ConnectButton() {
     // }
 
     function handleConnect() {
-        open()
+        open({view: "Networks"})
     }
 
     return (
@@ -34,7 +34,7 @@ function ConnectButton() {
             {
                 isConnected && <div>Вы подали заявку на участие</div>
             }
-
+            {/*<w3m-network-button/>*/}
         </div>
     );
 }
