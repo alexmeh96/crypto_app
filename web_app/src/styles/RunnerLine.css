@@ -1,0 +1,42 @@
+.header {
+  overflow: hidden;
+  height: 50px;
+  position: relative;
+}
+.header div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
+  /*width: 100%;*/
+  /*height: 60px;*/
+  transform: translate(100%, 0);
+}
+
+.header .ticker-wrapper__first-half, .header .ticker-wrapper__second-half {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  position: absolute;
+  /*top: 0;*/
+  top: 15px;
+  right: 0;
+  animation: ticker 40s infinite linear forwards;
+white-space: pre;
+}
+.header .ticker-wrapper__second-half {
+  animation: 40s ticker 20s infinite linear forwards;
+}
+@keyframes ticker {
+  0% {
+    transform: translate(100%, 0);
+  }
+  50% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
+}
