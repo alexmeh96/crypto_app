@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/spruceid/siwe-go"
 	"net/http"
+	"net/url"
 	"sync"
 )
 
@@ -106,6 +108,46 @@ func (a *Auth) getInfo(w http.ResponseWriter, r *http.Request) error {
 	walletInfo, err := store.getWallet(address)
 	a.mu.RUnlock()
 	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, walletInfo)
+}
+
+func (a *Auth) getInfoWithoutLogin(w http.ResponseWriter, r *http.Request) error {
+	params, _ := url.ParseQuery(r.URL.RawQuery)
+	address := params.Get("address")
+
+	if address == "" {
+		return fmt.Errorf("address is empty")
+	}
+
+	session, _ := sessionStore.Get(r, "sessionId")
+	session.Values["address"] = address
+
+	a.mu.Lock()
+	walletInfo, err := store.getWallet(address)
+	if err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	if walletInfo == nil {
+		if err = store.saveWallet(address); err != nil {
+			a.mu.Unlock()
+			return err
+		}
+
+		walletInfo = &Wallet{
+			Address: address,
+			Paid:    false,
+		}
+	}
+	a.mu.Unlock()
+
+	session.Values["address"] = address
+	session.Values["authenticated"] = true
+
+	if err := session.Save(r, w); err != nil {
 		return err
 	}
 

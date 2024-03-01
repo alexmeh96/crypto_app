@@ -11,15 +11,15 @@ const projectId = process.env.PROJECT_ID || 'd74e4c0a6c8b102c3f63ef7066b52612'
 
 const chains = [
     sepolia,
-    mainnet,
-    polygon,
-    avalanche,
-    arbitrum,
-    bsc,
-    optimism,
-    gnosis,
-    fantom,
-    base
+    // mainnet,
+    // polygon,
+    // avalanche,
+    // arbitrum,
+    // bsc,
+    // optimism,
+    // gnosis,
+    // fantom,
+    // base
 ] as const
 
 const metadata = {
@@ -53,7 +53,7 @@ export const config = defaultWagmiConfig({
 })
 
 const siweConfig = createSIWEConfig({
-    // enabled: false,
+    enabled: false,
     createMessage: ({ nonce, address, chainId }: SIWECreateMessageArgs) =>
         new SiweMessage({
             version: '1',

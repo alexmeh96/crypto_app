@@ -51,6 +51,27 @@ export async function getInfo(): Promise<WalletInfo> {
     }
 }
 
+export async function getInfoWithoutLogin(address: string): Promise<WalletInfo> {
+    try {
+        const res = await fetch(`http://localhost:8085/api/info-without-login?address=${address}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+        console.log(res)
+
+        if (res.ok) {
+            return await res.json();
+        }
+
+        throw await res.json()
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
+
 export async function pay() {
     try {
         const res = await fetch('http://localhost:8085/api/paid', {

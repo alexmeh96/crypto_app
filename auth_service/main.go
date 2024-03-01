@@ -20,13 +20,14 @@ func main() {
 	mux.HandleFunc("POST /api/signin", makeHTTPHandleFunc(auth.signIn))
 	mux.HandleFunc("GET /api/signout", withAuth(makeHTTPHandleFunc(auth.signOut)))
 
+	mux.HandleFunc("GET /api/info-without-login", makeHTTPHandleFunc(auth.getInfoWithoutLogin))
 	mux.HandleFunc("GET /api/info", withAuth(makeHTTPHandleFunc(auth.getInfo)))
 	mux.HandleFunc("POST /api/paid", withAuth(makeHTTPHandleFunc(auth.updatePaid)))
 
 	//handler := cors.Default().Handler(mux)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:3000", "https://adaptivebrc20.com"},
 		AllowCredentials: true,
 		//Debug:            true,
 	})

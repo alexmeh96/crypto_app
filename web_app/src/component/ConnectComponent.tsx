@@ -17,7 +17,8 @@ function ConnectComponent() {
     // }, []);
 
     function handleConnect() {
-        open({view: "Networks"})
+        // open({view: "Networks"})
+        open()
     }
 
     return (

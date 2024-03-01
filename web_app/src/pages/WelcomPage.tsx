@@ -5,7 +5,7 @@ import banner from '../assets/banner.png';
 import ConnectComponent from "../component/ConnectComponent";
 import {useStore} from "../store/store";
 import React, {useEffect, useState} from "react";
-import {getInfo, signOut} from "../service/authService";
+import {getInfo, getInfoWithoutLogin, signOut} from "../service/authService";
 import {useAccount, useDisconnect} from "wagmi";
 import PayComponent from "../component/PayComponent";
 import PayModal from "../component/PayModal";
@@ -25,17 +25,30 @@ export function WelcomePage() {
     const {address, isConnected} = useAccount()
     const {disconnect} = useDisconnect()
 
+
+    useEffect(() => {
+        if (isConnected && address) {
+            getWalletInfo(address)
+        }
+    }, [isConnected, address]);
+
     async function handleStart() {
         if (isConnected && address) {
-            try {
-                const data = await getInfo()
-                setWalletInfo(data)
-            } catch (e) {
-
-            } finally {
-                setLoad(false)
-            }
+            await getWalletInfo(address)
         } else {
+            setLoad(false)
+        }
+    }
+
+
+    async function getWalletInfo(address: string) {
+        try {
+            // const data = await getInfo()
+            const data = await getInfoWithoutLogin(address)
+            setWalletInfo(data)
+        } catch (e) {
+
+        } finally {
             setLoad(false)
         }
     }
@@ -86,12 +99,13 @@ export function WelcomePage() {
                         {
                             walletInfo && !load &&
                             <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
-                                {
-                                    !walletInfo.paid && <PayComponent/>
-                                }
-                                {
-                                    walletInfo.paid && <div>Paid</div>
-                                }
+                                <PayComponent/>
+                                {/*{*/}
+                                {/*    !walletInfo.paid && <PayComponent/>*/}
+                                {/*}*/}
+                                {/*{*/}
+                                {/*    walletInfo.paid && <div>Paid</div>*/}
+                                {/*}*/}
                             </div>
                         }
                     </section>

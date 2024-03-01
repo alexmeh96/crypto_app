@@ -1,5 +1,7 @@
 import "../styles/PayModal.scss"
 import React, {useEffect, useState} from "react";
+import {pay} from "../service/authService";
+import {useStore} from "../store/store";
 
 interface PayModalProps {
     visible: boolean,
@@ -7,9 +9,8 @@ interface PayModalProps {
 }
 
 function PayModal({visible, setVisible}: PayModalProps) {
-
+    const {walletInfo, setWalletInfo} = useStore()
     const [dapt, setDapt] = useState<number>()
-
     const [value, setValue] = useState<number>(1000)
 
     useEffect(() => {
@@ -17,10 +18,13 @@ function PayModal({visible, setVisible}: PayModalProps) {
     }, [value]);
 
     function handleChange(e: any) {
-
         const num = isNaN(e.target.value) ? 0 : Number(e.target.value)
-
         setValue(num)
+    }
+
+    async function handlePay() {
+        await pay()
+        setWalletInfo({address: walletInfo.address, paid: true})
     }
 
     return (
@@ -38,7 +42,8 @@ function PayModal({visible, setVisible}: PayModalProps) {
 
 
                     <div className="form__group field" style={{textAlign: "center"}}>
-                        <input value={value} onChange={handleChange} type="input" className="form__field" placeholder="USDT" name="USDT" id='USDT' required/>
+                        <input value={value} onChange={handleChange} type="input" className="form__field"
+                               placeholder="USDT" name="USDT" id='USDT' required/>
                         <label htmlFor="USDT" className="form__label">USDT</label>
                     </div>
 
@@ -55,8 +60,7 @@ function PayModal({visible, setVisible}: PayModalProps) {
                                 Cancel
                             </button>
 
-                            <button onClick={() => {
-                            }}
+                            <button onClick={() => handlePay()}
                                     data-w-id="fe515213-ada7-58ca-3984-dc6eeb4ce466"
                                     className="button w-button pay-modal-button"
                             >
