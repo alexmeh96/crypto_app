@@ -100,6 +100,26 @@ func (a *Auth) updatePaid(w http.ResponseWriter, r *http.Request) error {
 	return WriteText(w, http.StatusOK, "")
 }
 
+func (a *Auth) updatePaidWithoutLogin(w http.ResponseWriter, r *http.Request) error {
+	params, _ := url.ParseQuery(r.URL.RawQuery)
+	address := params.Get("address")
+
+	if address == "" {
+		return fmt.Errorf("address is empty")
+	}
+	//session, _ := sessionStore.Get(r, "sessionId")
+	//address := session.Values["address"].(string)
+
+	a.mu.Lock()
+	if err := store.updateWallet(address, true); err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	a.mu.Unlock()
+
+	return WriteText(w, http.StatusOK, "")
+}
+
 func (a *Auth) getInfo(w http.ResponseWriter, r *http.Request) error {
 	session, _ := sessionStore.Get(r, "sessionId")
 	address := session.Values["address"].(string)

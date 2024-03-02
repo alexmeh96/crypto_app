@@ -1,10 +1,12 @@
 import PayModal from "./PayModal";
 import React, {useState} from "react";
-import {useStore} from "../store/store";
+import {useLoadStore, useStore} from "../store/store";
+import SpinnerComponent from "./SpinnerComponent";
 
-function PayComponent() {
+function InfoComponent() {
 
     const {walletInfo, setWalletInfo} = useStore()
+    const {load, setLoad} = useLoadStore()
 
     const [visible, setVisible] = useState(false)
 
@@ -44,4 +46,4 @@ function PayComponent() {
     );
 }
 
-export default PayComponent;
+export default InfoComponent;

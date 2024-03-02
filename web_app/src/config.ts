@@ -10,8 +10,8 @@ import {useStore} from "./store/store";
 const projectId = process.env.PROJECT_ID || 'd74e4c0a6c8b102c3f63ef7066b52612'
 
 const chains = [
-    sepolia,
-    // mainnet,
+    // sepolia,
+    mainnet,
     // polygon,
     // avalanche,
     // arbitrum,
@@ -23,8 +23,8 @@ const chains = [
 ] as const
 
 const metadata = {
-    name: 'Web3Modal',
-    description: 'Web3Modal Example',
+    name: 'Adapt',
+    description: 'Connect your wallet to adapt',
     url: 'https://web3modal.com', // origin must match your domain & subdomain
     icons: ['https://avatars.githubusercontent.com/u/37784886'],
 }

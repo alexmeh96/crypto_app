@@ -14,3 +14,16 @@ export const useStore = create<Store>()(
         })
     )
 )
+
+type LoadStore = {
+    load: boolean,
+    setLoad: (value: boolean) => void,
+}
+export const useLoadStore = create<LoadStore>()(
+    devtools(
+        set => ({
+            load: false,
+            setLoad: (value: boolean) => set({load: value})
+        })
+    )
+)

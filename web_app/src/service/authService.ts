@@ -3,8 +3,11 @@ import {getAccount} from '@wagmi/core'
 import {WalletInfo} from "../App";
 
 
+const API = "http://109.71.244.176:8085"
+// const API = "http://localhost:8085"
+
 export async function getNonce() {
-    const res = await fetch(`http://localhost:8085/api/nonce`, {
+    const res = await fetch(`${API}/api/nonce`, {
         credentials: 'include',
     })
 
@@ -12,7 +15,7 @@ export async function getNonce() {
 }
 
 export async function validateMessage({message, signature}: any): Promise<WalletInfo> {
-    const res = await fetch('http://localhost:8085/api/signin', {
+    const res = await fetch(`${API}/api/signin`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
@@ -32,7 +35,7 @@ export async function getSession() {
 
 export async function getInfo(): Promise<WalletInfo> {
     try {
-        const res = await fetch('http://localhost:8085/api/info', {
+        const res = await fetch(`${API}/api/info`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -52,8 +55,11 @@ export async function getInfo(): Promise<WalletInfo> {
 }
 
 export async function getInfoWithoutLogin(address: string): Promise<WalletInfo> {
+    console.log("ttt1")
+
+    // await new Promise(res => setTimeout(res, 1000))
     try {
-        const res = await fetch(`http://localhost:8085/api/info-without-login?address=${address}`, {
+        const res = await fetch(`${API}/api/info-without-login?address=${address}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -72,9 +78,11 @@ export async function getInfoWithoutLogin(address: string): Promise<WalletInfo> 
     }
 }
 
-export async function pay() {
+export async function pay(address: string) {
+    // await new Promise(res => setTimeout(res, 1000))
     try {
-        const res = await fetch('http://localhost:8085/api/paid', {
+        // const res = await fetch(`${API}/api/paid`, {
+        const res = await fetch(`${API}/api/paid?address=${address}`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -95,7 +103,7 @@ export async function pay() {
 
 export async function signOut() {
     try {
-        await fetch('http://localhost:8085/api/signout', {
+        await fetch(`${API}/api/signout`, {
             credentials: 'include',
         })
 

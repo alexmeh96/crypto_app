@@ -1,35 +1,38 @@
 import {useAccount, useDisconnect} from "wagmi";
 import {useWeb3Modal} from '@web3modal/wagmi/react'
-import {useEffect} from "react";
+import React, {useEffect} from "react";
+import {useLoadStore} from "../store/store";
+import SpinnerComponent from "./SpinnerComponent";
 
 function ConnectComponent() {
-
-    const {isConnected} = useAccount()
-    const { disconnect } = useDisconnect()
-
+    const {load, setLoad} = useLoadStore()
     const {open} = useWeb3Modal()
 
-    // useEffect(() => {
-    //     if (isConnected) {
-    //         console.log("WWW")
-    //         disconnect()
-    //     }
-    // }, []);
-
-    function handleConnect() {
+    async function handleConnect() {
+        setLoad(true)
         // open({view: "Networks"})
-        open()
+        try {
+            await open()
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoad(false)
+        }
     }
 
     return (
         <div>
             {
                 <button onClick={handleConnect}
+                        disabled={load}
                         data-w-id="fe515213-ada7-58ca-3984-dc6eeb4ce466"
                         className="button w-button"
                         style={{width: "unset", paddingLeft: "30px", paddingRight: "30px"}}
                 >
-                    Participate
+                    {
+                        // load ? <SpinnerComponent ml="53px" width="30px"/> : "Participate"
+                        load ? <SpinnerComponent /> : "Participate"
+                    }
                 </button>
             }
         </div>

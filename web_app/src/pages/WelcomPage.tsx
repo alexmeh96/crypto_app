@@ -3,13 +3,13 @@ import logo from '../assets/logo.png';
 // @ts-ignore
 import banner from '../assets/banner.png';
 import ConnectComponent from "../component/ConnectComponent";
-import {useStore} from "../store/store";
+import {useLoadStore, useStore} from "../store/store";
 import React, {useEffect, useState} from "react";
-import {getInfo, getInfoWithoutLogin, signOut} from "../service/authService";
+import {getInfoWithoutLogin, signOut} from "../service/authService";
 import {useAccount, useDisconnect} from "wagmi";
-import PayComponent from "../component/PayComponent";
-import PayModal from "../component/PayModal";
+import InfoComponent from "../component/InfoComponent";
 import RunnerLine from "../component/RunnerLine";
+import SpinnerComponent from "../component/SpinnerComponent";
 
 
 export interface WalletInfo {
@@ -20,36 +20,46 @@ export interface WalletInfo {
 export function WelcomePage() {
 
     const {walletInfo, setWalletInfo} = useStore()
+    const {load, setLoad} = useLoadStore()
 
-    const [load, setLoad] = useState(true)
+    // const [loading, setLoading] = useState(true)
     const {address, isConnected} = useAccount()
     const {disconnect} = useDisconnect()
 
+    console.log(isConnected && address, 'eee1')
 
     useEffect(() => {
-        if (isConnected && address) {
+        if (address && !load) {
             getWalletInfo(address)
+        } else if (!isConnected) {
+            setWalletInfo(null)
         }
     }, [isConnected, address]);
 
     async function handleStart() {
-        if (isConnected && address) {
-            await getWalletInfo(address)
-        } else {
-            setLoad(false)
-        }
+        // if (isConnected && address) {
+        //     await getWalletInfo(address)
+        // }
+        // else {
+        //     setLoading(false)
+        // }
     }
 
 
     async function getWalletInfo(address: string) {
         try {
+            setLoad(true)
             // const data = await getInfo()
             const data = await getInfoWithoutLogin(address)
+
+            console.log(data, "getInfoWithoutLogin")
             setWalletInfo(data)
         } catch (e) {
-
+            console.error(e)
         } finally {
+            // setLoading(false)
             setLoad(false)
+
         }
     }
 
@@ -91,21 +101,15 @@ export function WelcomePage() {
                         {/*    load && <div>load...</div>*/}
                         {/*}*/}
                         {
-                            !walletInfo && !load &&
+                            (!walletInfo || !isConnected) &&
                             <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
                                 <ConnectComponent/>
                             </div>
                         }
                         {
-                            walletInfo && !load &&
+                            walletInfo && isConnected &&
                             <div className="div-block" style={{marginTop: "100px", justifyContent: 'center'}}>
-                                <PayComponent/>
-                                {/*{*/}
-                                {/*    !walletInfo.paid && <PayComponent/>*/}
-                                {/*}*/}
-                                {/*{*/}
-                                {/*    walletInfo.paid && <div>Paid</div>*/}
-                                {/*}*/}
+                                <InfoComponent/>
                             </div>
                         }
                     </section>

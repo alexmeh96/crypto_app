@@ -9,7 +9,7 @@ function RunnerLine() {
 
                 {/*<p>Community Sale  $ 10% of the total number of participants receive an allocation $ | Private Sale: SOLD OUT ($0.06) | Community Sale: (price $0.1) | Public Sale: Coming Soon (price $0.2) | Listing in April: Coming Soon (price $0.6)</p>*/}
 
-                <p>First round $ 10% of the total number of participants receive an allocation $</p>
+                <p>Community Sale  $ 10% of the total number of participants receive an allocation $</p>
                 <p> | </p>
                 <p>Private Sale: SOLD OUT ($0.06)</p>
                 <p> | </p>
@@ -21,7 +21,7 @@ function RunnerLine() {
                 <p> | </p>
             </div>
             <div className="ticker-wrapper__second-half t-20">
-                <p>First round $ 10% of the total number of participants receive an allocation $</p>
+                <p>Community Sale $ 10% of the total number of participants receive an allocation $</p>
                 <p> | </p>
                 <p>Private Sale: SOLD OUT ($0.06)</p>
                 <p> | </p>

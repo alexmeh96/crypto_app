@@ -22,7 +22,8 @@ func main() {
 
 	mux.HandleFunc("GET /api/info-without-login", makeHTTPHandleFunc(auth.getInfoWithoutLogin))
 	mux.HandleFunc("GET /api/info", withAuth(makeHTTPHandleFunc(auth.getInfo)))
-	mux.HandleFunc("POST /api/paid", withAuth(makeHTTPHandleFunc(auth.updatePaid)))
+	// 	mux.HandleFunc("POST /api/paid", withAuth(makeHTTPHandleFunc(auth.updatePaid)))
+	mux.HandleFunc("POST /api/paid", makeHTTPHandleFunc(auth.updatePaidWithoutLogin))
 
 	//handler := cors.Default().Handler(mux)
 
