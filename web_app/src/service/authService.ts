@@ -54,50 +54,91 @@ export async function getInfo(): Promise<WalletInfo> {
     }
 }
 
-export async function getInfoWithoutLogin(address: string): Promise<WalletInfo> {
-    console.log("ttt1")
+// export async function getInfoWithoutLogin(address: string): Promise<WalletInfo> {
+//     console.log("ttt1")
+//
+//     // await new Promise(res => setTimeout(res, 1000))
+//     try {
+//         const res = await fetch(`${API}/api/info-without-login?address=${address}`, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             // credentials: 'include',
+//         })
+//         console.log(res)
+//
+//         if (res.ok) {
+//             return await res.json();
+//         }
+//
+//         throw await res.json()
+//     } catch (err) {
+//         console.log(err)
+//         throw err
+//     }
+// }
 
-    // await new Promise(res => setTimeout(res, 1000))
-    try {
-        const res = await fetch(`${API}/api/info-without-login?address=${address}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        })
-        console.log(res)
+export async function getInfoWithoutLogin(address: string):  Promise<WalletInfo> {
+    let paid = localStorage.getItem(`dapt_${address}`);
 
-        if (res.ok) {
-            return await res.json();
+    console.log(paid, "ddd1")
+
+    if (!paid) {
+        console.log("ddd2")
+
+        localStorage.setItem(`dapt_${address}`, "false")
+
+        return {
+            address,
+            paid: false,
         }
-
-        throw await res.json()
-    } catch (err) {
-        console.log(err)
-        throw err
     }
+
+    if (paid === "false") {
+        return {
+            address,
+            paid: false,
+        }
+    } else if (paid === "true") {
+        return {
+            address,
+            paid: true,
+        }
+    }
+
 }
 
+// export async function pay(address: string) {
+//     // await new Promise(res => setTimeout(res, 1000))
+//     try {
+//         // const res = await fetch(`${API}/api/paid`, {
+//         const res = await fetch(`${API}/api/paid?address=${address}`, {
+//             method: "POST",
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             // credentials: 'include',
+//         })
+//
+//         if (res.ok) {
+//             return
+//         }
+//
+//         throw await res.json()
+//     } catch (err) {
+//         console.log(err)
+//         throw err
+//     }
+// }
 export async function pay(address: string) {
-    // await new Promise(res => setTimeout(res, 1000))
-    try {
-        // const res = await fetch(`${API}/api/paid`, {
-        const res = await fetch(`${API}/api/paid?address=${address}`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        })
+    let paid = localStorage.getItem(`dapt_${address}`);
 
-        if (res.ok) {
-            return
-        }
+    if (!paid) {
+        throw Error("not address")
+    }
 
-        throw await res.json()
-    } catch (err) {
-        console.log(err)
-        throw err
+    if (paid === "false") {
+        localStorage.setItem(`dapt_${address}`, "true")
     }
 }
 
